@@ -85,7 +85,12 @@ _install_from_remote() {
 
   # exec replaces the current process — the temp dir stays alive until
   # the new process exits, then the OS reclaims it.
-  exec bash "$tmp_dir/ai-env-setup/install.sh" "$@"
+  # Re-attach stdin to the terminal if it's piped (e.g. via curl), to allow interactive prompts.
+  if [[ ! -t 0 && -c /dev/tty ]]; then
+    exec bash "$tmp_dir/ai-env-setup/install.sh" "$@" < /dev/tty
+  else
+    exec bash "$tmp_dir/ai-env-setup/install.sh" "$@"
+  fi
 }
 
 _bootstrap
