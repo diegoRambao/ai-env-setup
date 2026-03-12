@@ -48,7 +48,10 @@ _install_from_remote() {
   echo "Downloading ai-env-setup from GitHub..."
   local tmp_dir
   tmp_dir="$(mktemp -d)"
-  trap 'rm -rf "$tmp_dir"' EXIT
+
+  # NOTE: No trap here — we exec into the downloaded script, which becomes
+  # this process. A cleanup trap on EXIT would fire before exec finishes.
+  # The OS reclaims the temp dir on process exit naturally.
 
   # Prefer curl tarball (works without auth on public repos).
   # Fall back to git clone only if curl is unavailable.
@@ -62,8 +65,9 @@ _install_from_remote() {
     exit 1
   fi
 
-  # Re-execute from the downloaded copy, passing all original args
-  bash "$tmp_dir/ai-env-setup/install.sh" "$@"
+  # exec replaces the current process — the temp dir stays alive until
+  # the new process exits, then the OS reclaims it.
+  exec bash "$tmp_dir/ai-env-setup/install.sh" "$@"
 }
 
 _bootstrap
