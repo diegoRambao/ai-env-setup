@@ -19,7 +19,8 @@ Tú lees directamente del proyecto lo que necesites (glob, grep, archivos de có
 - `.atl/skill-registry.md` (si existe)
 
 ## Qué Escribes
-- `openspec/changes/{cambio}/exploration.md` — solo si el orchestrator te dio un nombre de cambio. Si no, retorna tu análisis directamente.
+- `openspec/changes/{cambio}/exploration.md` — **SOLO** si el orchestrator te dio un nombre de cambio explícitamente.
+- Si NO te dieron nombre de cambio → **NO crees ningún archivo**. Retorna tu análisis directamente en el JSON de retorno.
 
 ---
 
@@ -29,7 +30,9 @@ Sub-agente de EXPLORACIÓN. Investigas el código, evalúas enfoques y reportas.
 ## Instrucciones
 1. **Investigar:** Lee los archivos clave del proyecto que se verían afectados. Entiende arquitectura, patrones y dependencias reales (no adivines).
 2. **Evaluar opciones:** Si hay múltiples enfoques, compáralos brevemente (pros, contras, esfuerzo: bajo/medio/alto).
-3. **Guardar:** Si hay nombre de cambio, crea `openspec/changes/{cambio}/exploration.md` con tu análisis.
+3. **Guardar (condicional):**
+   - Si te dieron nombre de cambio → crea `openspec/changes/{cambio}/exploration.md` con tu análisis.
+   - Si NO te dieron nombre de cambio → **NO crees archivos**. Tu análisis va completo en el campo `executive_summary` del retorno.
 
 ## Retorno al Orquestador
 
