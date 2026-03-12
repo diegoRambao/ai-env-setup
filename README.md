@@ -10,10 +10,8 @@ multiple AI coding tools with a single command.
 | **OpenCode** | `~/.config/opencode/` | `.opencode/skills/` |
 | **Claude Code** | `~/.claude/` | `CLAUDE.md` + `.claude/skills/` |
 | **Kiro (AWS)** | `~/.kiro/` | `.kiro/skills/` + `.kiro/steering/` |
-| **GitHub Copilot** | `~/.agents/skills/` | `.github/copilot-instructions.md` |
-| **Antigravity** | `~/.agents/skills/` | `.github/copilot-instructions.md` |
-| **Cursor** | `~/.cursor/rules/` | `.cursorrules` + `.cursor/rules/` |
-| **Gemini CLI** | `~/.gemini/` | `GEMINI.md` + `.gemini/skills/` |
+| **GitHub Copilot** | `~/.config/github-copilot/` | `.github/copilot-instructions.md` |
+| **Antigravity** | `~/.gemini/antigravity/` | `.agents/skills/` |
 
 ## Quick start
 
@@ -36,7 +34,7 @@ curl -fsSL https://raw.githubusercontent.com/diegoRambao/ai-env-setup/main/insta
 ```bash
 ./install.sh --opencode --claude           # OpenCode + Claude Code, global + project
 ./install.sh --global --kiro               # Only Kiro, only global
-./install.sh --project --copilot --cursor  # Only project level
+./install.sh --project --copilot           # Only project level
 ./install.sh --all                         # Everything
 ./install.sh --dry-run --all               # Preview without changes
 ```
@@ -94,9 +92,7 @@ ai-env-setup/
 │   ├── claude.sh
 │   ├── kiro.sh
 │   ├── copilot.sh
-│   ├── antigravity.sh
-│   ├── cursor.sh
-│   └── gemini.sh
+│   └── antigravity.sh
 └── lib/                    # Shared utilities
     ├── common.sh           # Colors, logging, backup, JSON helpers
     ├── menu.sh             # Interactive checkbox menus
@@ -132,7 +128,7 @@ description: >
 | Scope | What it does |
 |-------|-------------|
 | **Global** | Installs skills and agents into the tool's user-level config directory. Active for every project. |
-| **Project** | Creates symlinks and instruction files (CLAUDE.md, .cursorrules, etc.) in the current working directory. Scoped to that repo. |
+| **Project** | Creates symlinks and instruction files (CLAUDE.md, etc.) in the current working directory. Scoped to that repo. |
 
 Both scopes can be enabled simultaneously.
 

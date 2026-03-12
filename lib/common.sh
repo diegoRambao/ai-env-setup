@@ -241,11 +241,13 @@ detect_tools() {
   CLAUDE_INSTALLED=false
   KIRO_INSTALLED=false
   COPILOT_INSTALLED=false
+  ANTIGRAVITY_INSTALLED=false
 
   tool_installed "$HOME/.config/opencode"        && OPENCODE_INSTALLED=true
   tool_installed "$HOME/.claude"                 && CLAUDE_INSTALLED=true
   [[ -d "$HOME/.kiro" || -d "$HOME/.config/kiro" ]] && KIRO_INSTALLED=true
   tool_installed "$HOME/.config/github-copilot"  && COPILOT_INSTALLED=true
+  tool_installed "$HOME/.gemini/antigravity"     && ANTIGRAVITY_INSTALLED=true
 }
 
 # Print detection summary
@@ -256,6 +258,7 @@ print_detection() {
     "Claude Code:$CLAUDE_INSTALLED:~/.claude/"
     "Kiro (AWS):$KIRO_INSTALLED:~/.kiro/"
     "GitHub Copilot:$COPILOT_INSTALLED:~/.config/github-copilot/"
+    "Antigravity:$ANTIGRAVITY_INSTALLED:~/.gemini/antigravity/"
   )
   for entry in "${tools[@]}"; do
     IFS=: read -r name installed path <<< "$entry"

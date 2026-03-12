@@ -4,7 +4,7 @@
 # Installs the SDD agent bundle (skills + agents) for multiple AI coding tools.
 #
 # Supported tools:
-#   OpenCode, Claude Code, Kiro (AWS), GitHub Copilot
+#   OpenCode, Claude Code, Kiro (AWS), GitHub Copilot, Antigravity
 #
 # Usage:
 #   ./install.sh                    # Interactive mode
@@ -123,6 +123,7 @@ SETUP_OPENCODE=false
 SETUP_CLAUDE=false
 SETUP_KIRO=false
 SETUP_COPILOT=false
+SETUP_ANTIGRAVITY=false
 
 FLAG_ALL=false
 FLAG_INTERACTIVE=true
@@ -163,6 +164,10 @@ _parse_args() {
         SETUP_COPILOT=true
         FLAG_INTERACTIVE=false
         shift ;;
+      --antigravity)
+        SETUP_ANTIGRAVITY=true
+        FLAG_INTERACTIVE=false
+        shift ;;
       --dry-run)
         DRY_RUN=true
         shift ;;
@@ -191,6 +196,7 @@ _parse_args() {
     SETUP_CLAUDE=true
     SETUP_KIRO=true
     SETUP_COPILOT=true
+    SETUP_ANTIGRAVITY=true
   fi
 
   # Default scope when tool flags given but no scope flags
@@ -219,6 +225,7 @@ _show_help() {
     --claude        Configure Claude Code
     --kiro          Configure Kiro (AWS)
     --copilot       Configure GitHub Copilot (VS Code)
+    --antigravity   Configure Antigravity
     --all           Configure all detected tools at all scopes
 
   OTHER FLAGS
@@ -231,6 +238,7 @@ _show_help() {
     ./install.sh                      # Interactive mode (recommended)
     ./install.sh --all                # Everything
     ./install.sh --global --opencode --claude
+    ./install.sh --project --antigravity
     ./install.sh --dry-run --all      # Preview
 
   ONE-LINER
@@ -276,7 +284,7 @@ _run_interactive() {
 
 _validate() {
   local any_tool=false
-  for flag in SETUP_OPENCODE SETUP_CLAUDE SETUP_KIRO SETUP_COPILOT; do
+  for flag in SETUP_OPENCODE SETUP_CLAUDE SETUP_KIRO SETUP_COPILOT SETUP_ANTIGRAVITY; do
     [[ "${!flag}" == "true" ]] && { any_tool=true; break; }
   done
 
@@ -315,10 +323,10 @@ _uninstall() {
   echo "    rm -rf ~/.config/opencode/skills/sdd-*"
   echo "    rm -rf ~/.claude/skills/sdd-*  ~/.claude/CLAUDE.md"
   echo "    rm -rf ~/.kiro/skills/sdd-*    ~/.kiro/agents/sdd-orchestrator.json ~/.kiro/agents/tech-lead.json"
-  echo "    rm -rf ~/.agents/skills/sdd-*"
+  echo "    rm -rf ~/.gemini/antigravity/skills/sdd-*"
   echo ""
   echo "  Project:"
-  echo "    rm -rf .opencode/skills .claude/skills .kiro/skills .github/skills"
+  echo "    rm -rf .opencode/skills .claude/skills .kiro/skills .github/skills .agents/skills"
   echo "    rm -f CLAUDE.md .github/copilot-instructions.md .kiro/kiro-instructions.md"
   echo ""
 }
@@ -332,7 +340,7 @@ _run_adapters() {
   local total=0
 
   # Count selected tools
-  for flag in SETUP_OPENCODE SETUP_CLAUDE SETUP_KIRO SETUP_COPILOT; do
+  for flag in SETUP_OPENCODE SETUP_CLAUDE SETUP_KIRO SETUP_COPILOT SETUP_ANTIGRAVITY; do
     [[ "${!flag}" == "true" ]] && total=$(( total + 1 ))
   done
 
@@ -346,6 +354,7 @@ _run_adapters() {
   [[ "$SETUP_CLAUDE"      == "true" ]] && { log_step $step $total "Claude Code";    setup_claude;      echo ""; step=$(( step+1 )); }
   [[ "$SETUP_KIRO"        == "true" ]] && { log_step $step $total "Kiro (AWS)";     setup_kiro;        echo ""; step=$(( step+1 )); }
   [[ "$SETUP_COPILOT"     == "true" ]] && { log_step $step $total "GitHub Copilot"; setup_copilot;     echo ""; step=$(( step+1 )); }
+  [[ "$SETUP_ANTIGRAVITY" == "true" ]] && { log_step $step $total "Antigravity";    setup_antigravity; echo ""; step=$(( step+1 )); }
 }
 
 # =============================================================================
@@ -364,6 +373,7 @@ _print_summary() {
   [[ "$SETUP_CLAUDE"      == "true" ]] && echo -e "    ${GREEN}✓${NC} Claude Code"
   [[ "$SETUP_KIRO"        == "true" ]] && echo -e "    ${GREEN}✓${NC} Kiro (AWS)"
   [[ "$SETUP_COPILOT"     == "true" ]] && echo -e "    ${GREEN}✓${NC} GitHub Copilot"
+  [[ "$SETUP_ANTIGRAVITY" == "true" ]] && echo -e "    ${GREEN}✓${NC} Antigravity"
   echo ""
   echo -e "  ${DIM}Restart your AI tools to load the new configuration.${NC}"
   echo -e "  ${DIM}Run with --dry-run to preview changes before applying.${NC}"

@@ -11,6 +11,7 @@
 #   SETUP_CLAUDE      (true|false)
 #   SETUP_KIRO        (true|false)
 #   SETUP_COPILOT     (true|false)
+#   SETUP_ANTIGRAVITY (true|false)
 
 # =============================================================================
 # INTERNAL HELPERS
@@ -130,12 +131,14 @@ show_tools_menu() {
     "Claude Code        (~/.claude/)"
     "Kiro (AWS)         (~/.kiro/)"
     "GitHub Copilot     (VS Code + ~/.config/github-copilot/)"
+    "Antigravity        (~/.gemini/antigravity/ + .agents/)"
   )
   _MENU_DETECTED=(
     "$OPENCODE_INSTALLED"
     "$CLAUDE_INSTALLED"
     "$KIRO_INSTALLED"
     "$COPILOT_INSTALLED"
+    "$ANTIGRAVITY_INSTALLED"
   )
   # Pre-select detected tools
   _MENU_SELECTED=(
@@ -143,6 +146,7 @@ show_tools_menu() {
     "$CLAUDE_INSTALLED"
     "$KIRO_INSTALLED"
     "$COPILOT_INSTALLED"
+    "$ANTIGRAVITY_INSTALLED"
   )
 
   # If nothing detected, default to OpenCode
@@ -160,6 +164,7 @@ show_tools_menu() {
   SETUP_CLAUDE="${_MENU_SELECTED[1]}"
   SETUP_KIRO="${_MENU_SELECTED[2]}"
   SETUP_COPILOT="${_MENU_SELECTED[3]}"
+  SETUP_ANTIGRAVITY="${_MENU_SELECTED[4]}"
 }
 
 # =============================================================================
@@ -184,6 +189,7 @@ print_plan() {
   [[ "$SETUP_CLAUDE"      == "true" ]] && echo -e "    ${GREEN}✓${NC} Claude Code"
   [[ "$SETUP_KIRO"        == "true" ]] && echo -e "    ${GREEN}✓${NC} Kiro (AWS)"
   [[ "$SETUP_COPILOT"     == "true" ]] && echo -e "    ${GREEN}✓${NC} GitHub Copilot"
+  [[ "$SETUP_ANTIGRAVITY" == "true" ]] && echo -e "    ${GREEN}✓${NC} Antigravity"
 
   echo ""
   echo -e "  ${BOLD}Bundle contents:${NC}"
