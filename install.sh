@@ -16,12 +16,12 @@
 #   ./install.sh --uninstall        # Remove installed files
 #
 # One-liner install:
-#   curl -fsSL https://raw.githubusercontent.com/drambao/ai-env-setup/main/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/diegoRambao/ai-env-setup/main/install.sh | bash
 
 set -euo pipefail
 
 VERSION="1.0.0"
-REPO_URL="https://github.com/drambao/ai-env-setup"
+REPO_URL="https://github.com/diegoRambao/ai-env-setup"
 
 # =============================================================================
 # BOOTSTRAP: Resolve script dir (works when piped from curl too)
@@ -50,13 +50,15 @@ _install_from_remote() {
   tmp_dir="$(mktemp -d)"
   trap 'rm -rf "$tmp_dir"' EXIT
 
-  if command -v git &>/dev/null; then
-    git clone --depth=1 --quiet "$REPO_URL.git" "$tmp_dir/ai-env-setup"
-  elif command -v curl &>/dev/null; then
+  # Prefer curl tarball (works without auth on public repos).
+  # Fall back to git clone only if curl is unavailable.
+  if command -v curl &>/dev/null; then
     curl -fsSL "$REPO_URL/archive/refs/heads/main.tar.gz" | tar xz -C "$tmp_dir"
     mv "$tmp_dir"/ai-env-setup-main "$tmp_dir/ai-env-setup"
+  elif command -v git &>/dev/null; then
+    git clone --depth=1 --quiet "$REPO_URL.git" "$tmp_dir/ai-env-setup"
   else
-    echo "Error: git or curl is required to download ai-env-setup."
+    echo "Error: curl or git is required to download ai-env-setup."
     exit 1
   fi
 

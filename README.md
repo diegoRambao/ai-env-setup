@@ -20,7 +20,7 @@ multiple AI coding tools with a single command.
 ### Interactive (recommended)
 
 ```bash
-git clone https://github.com/drambao/ai-env-setup.git
+git clone https://github.com/diegoRambao/ai-env-setup.git
 cd ai-env-setup
 ./install.sh
 ```
@@ -28,7 +28,7 @@ cd ai-env-setup
 ### One-liner
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/drambao/ai-env-setup/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/diegoRambao/ai-env-setup/main/install.sh | bash
 ```
 
 ### Specific tools
