@@ -60,4 +60,5 @@ setup_opencode_project() {
 setup_opencode() {
   [[ "$SCOPE_GLOBAL"  == "true" ]] && setup_opencode_global
   [[ "$SCOPE_PROJECT" == "true" ]] && setup_opencode_project
+  return 0
 }

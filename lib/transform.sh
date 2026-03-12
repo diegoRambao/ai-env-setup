@@ -140,23 +140,241 @@ with open(src_path) as f:
 kiro = {
     "name":           src.get("name", ""),
     "description":    src.get("description", ""),
-    "prompt":         src.get("prompt", None),
-    "mcpServers":     {},
     "tools":          list(src.get("tools", {}).keys()) if isinstance(src.get("tools"), dict) else ["read", "write", "shell"],
-    "toolAliases":    {},
     "allowedTools":   [],
-    "resources":      [],
-    "hooks":          {},
-    "toolsSettings":  {},
-    "includeMcpJson": True,
-    "model":          None
+    "resources":      [
+        "file://.kiro/steering/**/*.md",
+        "skill://.kiro/skills/**/SKILL.md"
+    ],
+    "prompt":         src.get("prompt", "")
 }
+if "model" in src:
+    kiro["model"] = src["model"]
+elif "model" in src.get("toolsSettings", {}):
+    kiro["model"] = src["toolsSettings"]["model"]
 
 with open(dst_path, "w") as f:
     json.dump(kiro, f, indent=2, ensure_ascii=False)
     f.write("\n")
 PYEOF
     log_ok "Created Kiro agent: $agent_name"
+  done
+}
+
+# =============================================================================
+# AGENTS: Claude (create agents/*.md files)
+# =============================================================================
+
+# Transform bundle agent JSON files into Claude agent markdown configs.
+# Usage: install_agents_claude <bundle_agents_dir> <claude_agents_dir>
+install_agents_claude() {
+  local src="$1"   # e.g. $BUNDLE_DIR/agents
+  local dst="$2"   # e.g. ~/.claude/agents
+
+  require_python3 || return 1
+  ensure_dir "$dst"
+
+  for agent_file in "$src"/*.json; do
+    [[ -f "$agent_file" ]] || continue
+
+    local agent_name
+    agent_name="$(python3 -c "import json,sys; d=json.load(open('$agent_file')); print(d['name'])")"
+    local claude_file="$dst/${agent_name}.md"
+
+    if [[ -f "$claude_file" ]]; then
+      backup_if_exists "$claude_file"
+    fi
+
+    if [[ "$DRY_RUN" == "true" ]]; then
+      log_dim "[dry-run] Would create Claude agent: $claude_file"
+      continue
+    fi
+
+    python3 - "$agent_file" "$claude_file" <<'PYEOF'
+import json, sys
+
+src_path = sys.argv[1]
+dst_path = sys.argv[2]
+
+script_content = ""
+with open(src_path) as f:
+    src = json.load(f)
+
+name = src.get("name", "Unknown Agent")
+desc = src.get("description", "")
+desc_escaped = desc.replace('"', '\\"')
+prompt = src.get("prompt", "")
+
+tools = src.get("tools", [])
+if isinstance(tools, dict):
+    tools = list(tools.keys())
+tools_str = ", ".join(tools)
+
+tools_yaml = ""
+if tools_str:
+    tools_yaml = f"tools: {tools_str}\n"
+
+model_line = ""
+if "model" in src:
+    model_line = f"model: {src['model']}\n"
+elif "toolsSettings" in src and "model" in src["toolsSettings"]:
+    model_line = f"model: {src['toolsSettings']['model']}\n"
+
+content = f"""---
+name: {name}
+description: "{desc_escaped}"
+{tools_yaml}{model_line.strip()}
+---
+
+{prompt}
+"""
+
+with open(dst_path, "w") as f:
+    f.write(content)
+PYEOF
+    log_ok "Created Claude agent: $agent_name"
+  done
+}
+
+# =============================================================================
+# AGENTS: Copilot (create agents/*.agent.md files)
+# =============================================================================
+
+# Transform bundle agent JSON files into Copilot custom agent configs (.agent.md).
+# Usage: install_agents_copilot <bundle_agents_dir> <copilot_agents_dir>
+install_agents_copilot() {
+  local src="$1"   # e.g. $BUNDLE_DIR/agents
+  local dst="$2"   # e.g. ~/.copilot/agents
+
+  require_python3 || return 1
+  ensure_dir "$dst"
+
+  for agent_file in "$src"/*.json; do
+    [[ -f "$agent_file" ]] || continue
+
+    local agent_name
+    agent_name="$(python3 -c "import json,sys; d=json.load(open('$agent_file')); print(d['name'])")"
+    local copilot_file="$dst/${agent_name}.agent.md"
+
+    if [[ -f "$copilot_file" ]]; then
+      backup_if_exists "$copilot_file"
+    fi
+
+    if [[ "$DRY_RUN" == "true" ]]; then
+      log_dim "[dry-run] Would create Copilot agent: $copilot_file"
+      continue
+    fi
+
+    python3 - "$agent_file" "$copilot_file" <<'PYEOF'
+import json, sys
+
+src_path = sys.argv[1]
+dst_path = sys.argv[2]
+
+with open(src_path) as f:
+    src = json.load(f)
+
+name = src.get("name", "Unknown Agent")
+desc = src.get("description", "")
+desc_escaped = desc.replace('"', '\\"')
+prompt = src.get("prompt", "")
+
+tools = src.get("tools", [])
+if isinstance(tools, dict):
+    tools = list(tools.keys())
+tools_json = json.dumps(tools) if tools else "[]"
+
+content = f"""---
+name: {name}
+description: "{desc_escaped}"
+target: vscode
+tools: {tools_json}
+---
+
+{prompt}
+"""
+
+with open(dst_path, "w") as f:
+    f.write(content)
+PYEOF
+    log_ok "Created Copilot agent: $agent_name"
+  done
+}
+
+# =============================================================================
+# AGENTS: Gemini (create agents/*.md files)
+# =============================================================================
+
+# Transform bundle agent JSON files into Gemini agent markdown configs.
+# Usage: install_agents_gemini <bundle_agents_dir> <gemini_agents_dir>
+install_agents_gemini() {
+  local src="$1"   # e.g. $BUNDLE_DIR/agents
+  local dst="$2"   # e.g. ~/.gemini/agents
+
+  require_python3 || return 1
+  ensure_dir "$dst"
+
+  for agent_file in "$src"/*.json; do
+    [[ -f "$agent_file" ]] || continue
+
+    local agent_name
+    agent_name="$(python3 -c "import json,sys; d=json.load(open('$agent_file')); print(d['name'])")"
+    local gemini_file="$dst/${agent_name}.md"
+
+    if [[ -f "$gemini_file" ]]; then
+      backup_if_exists "$gemini_file"
+    fi
+
+    if [[ "$DRY_RUN" == "true" ]]; then
+      log_dim "[dry-run] Would create Gemini agent: $gemini_file"
+      continue
+    fi
+
+    python3 - "$agent_file" "$gemini_file" <<'PYEOF'
+import json, sys
+
+src_path = sys.argv[1]
+dst_path = sys.argv[2]
+
+with open(src_path) as f:
+    src = json.load(f)
+
+name = src.get("name", "Unknown Agent")
+desc = src.get("description", "")
+desc_escaped = desc.replace('"', '\\"')
+prompt = src.get("prompt", "")
+
+# Gemini format uses a list of tools
+tools = src.get("tools", [])
+if isinstance(tools, dict):
+    tools = list(tools.keys())
+
+# Provide the tools via YAML format
+tools_yaml = ""
+if tools:
+    tools_yaml = "tools:\n" + "\n".join([f"  - {t}" for t in tools]) + "\n"
+
+# Only add model if it exists
+model_line = ""
+if "model" in src:
+    model_line = f"model: {src['model']}\n"
+elif "toolsSettings" in src and "model" in src["toolsSettings"]:
+    model_line = f"model: {src['toolsSettings']['model']}\n"
+
+content = f"""---
+name: {name}
+description: "{desc_escaped}"
+kind: local
+{tools_yaml}{model_line.strip()}
+---
+
+{prompt}
+"""
+
+with open(dst_path, "w") as f:
+    f.write(content)
+PYEOF
+    log_ok "Created Gemini agent: $agent_name"
   done
 }
 

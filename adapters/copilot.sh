@@ -23,6 +23,10 @@ setup_copilot_global() {
   # Update .skill-lock.json if it exists
   _update_skill_lock
 
+  # 3. Install custom agents
+  log_info "Creating agent configs in ~/.copilot/agents/..."
+  install_agents_copilot "$BUNDLE_DIR/agents" "$HOME/.copilot/agents"
+
   log_ok "GitHub Copilot global setup complete"
   log_warn "Note: Copilot reads skills via the ~/.agents/ cross-agent ecosystem."
   log_warn "      Restart VS Code / Copilot to load the new skills."
@@ -44,6 +48,10 @@ setup_copilot_project() {
     "$BUNDLE_DIR/agents" \
     "$project_dir/.github/copilot-instructions.md" \
     "GitHub Copilot"
+
+  # 3. Install custom agents
+  log_info "Creating agent configs in .github/agents/..."
+  install_agents_copilot "$BUNDLE_DIR/agents" "$project_dir/.github/agents"
 
   log_ok "GitHub Copilot project setup complete"
 }
@@ -114,4 +122,5 @@ PYEOF
 setup_copilot() {
   [[ "$SCOPE_GLOBAL"  == "true" ]] && setup_copilot_global
   [[ "$SCOPE_PROJECT" == "true" ]] && setup_copilot_project
+  return 0
 }

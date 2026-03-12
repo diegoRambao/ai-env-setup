@@ -29,6 +29,10 @@ setup_claude_global() {
     "$CLAUDE_DIR/CLAUDE.md" \
     "Claude Code"
 
+  # 3. Install agents
+  log_info "Creating agent configs in ~/.claude/agents/..."
+  install_agents_claude "$BUNDLE_DIR/agents" "$CLAUDE_DIR/agents"
+
   log_ok "Claude Code global setup complete"
 }
 
@@ -49,10 +53,15 @@ setup_claude_project() {
     "$project_dir/CLAUDE.md" \
     "Claude Code"
 
+  # 3. Install agents
+  log_info "Creating agent configs in .claude/agents/..."
+  install_agents_claude "$BUNDLE_DIR/agents" "$project_dir/.claude/agents"
+
   log_ok "Claude Code project setup complete"
 }
 
 setup_claude() {
   [[ "$SCOPE_GLOBAL"  == "true" ]] && setup_claude_global
   [[ "$SCOPE_PROJECT" == "true" ]] && setup_claude_project
+  return 0
 }

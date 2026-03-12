@@ -41,11 +41,15 @@ setup_kiro_project() {
   ensure_dir "$project_dir/.kiro"
   safe_symlink "$link_path" "$BUNDLE_DIR/skills"
 
-  # 2. Generate steering document
+  # 2. Install agents (converted to Kiro format)
+  log_info "Creating agent configs in .kiro/agents/..."
+  install_agents_kiro "$BUNDLE_DIR/agents" "$project_dir/.kiro/agents"
+
+  # 3. Generate steering document
   log_info "Generating .kiro/steering/sdd.md..."
   _generate_kiro_steering "$project_dir/.kiro/steering/sdd.md"
 
-  # 3. Generate kiro-instructions.md
+  # 4. Generate kiro-instructions.md
   log_info "Generating .kiro/kiro-instructions.md..."
   generate_instructions_md \
     "$BUNDLE_DIR/skills" \
@@ -120,4 +124,5 @@ STEERING
 setup_kiro() {
   [[ "$SCOPE_GLOBAL"  == "true" ]] && setup_kiro_global
   [[ "$SCOPE_PROJECT" == "true" ]] && setup_kiro_project
+  return 0
 }
