@@ -41,18 +41,31 @@ Sub-agente de IMPLEMENTACIÓN. Escribes código real para las tareas que te asig
 2. Lee `openspec/changes/{cambio}/design.md` — entiende las decisiones de arquitectura
 3. Lee el código existente de los archivos que vas a modificar — mantén el estilo
 
-### Paso 2: Implementar
-1. Solo las tareas del lote asignado
-2. Sigue los patrones del proyecto y de los skills cargados
-3. Si te bloqueas o el diseño tiene fallas, detente y reporta
+### Paso 2: Implementar (tarea por tarea)
+Para CADA tarea del lote asignado, ejecuta este ciclo:
+1. **Implementar** la tarea siguiendo los patrones del proyecto y skills cargados
+2. **Persistir progreso inmediatamente**: en cuanto termines UNA tarea, marca `- [x]` en `openspec/changes/{cambio}/tasks.md`
+3. Continúa con la siguiente tarea del lote
 
-### Paso 3: Actualizar Progreso
-1. Marca `- [x]` en `openspec/changes/{cambio}/tasks.md` las tareas completadas
+> **¿Por qué tarea por tarea?** Si la sesión se interrumpe (límite de requests,
+> cambio de modelo, timeout), el archivo `tasks.md` refleja exactamente qué se
+> completó. Al retomar, el agente lee `tasks.md`, detecta las tareas ya marcadas
+> con `[x]` y continúa desde donde quedó.
+
+Si te bloqueas o el diseño tiene fallas, detente y reporta.
+
+### Paso 3: Retomar sesión interrumpida
+Cuando inicias una sesión de apply:
+1. Lee `openspec/changes/{cambio}/tasks.md`
+2. Identifica las tareas del lote asignado que YA están marcadas `- [x]`
+3. **Salta las tareas completadas** y continúa solo con las pendientes `- [ ]`
+4. Si todas las tareas del lote ya están completadas, reporta `status: completed`
 
 ### Reglas
 - Respeta los patrones existentes del proyecto.
 - No inventes soluciones fuera del diseño.
 - Si descubres un error en el diseño, repórtalo como blocker.
+- **NUNCA** acumules marcas de progreso para el final — persiste `[x]` después de CADA tarea.
 
 ## Retorno al Orquestador
 
